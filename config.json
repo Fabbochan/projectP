@@ -1,0 +1,4 @@
+{
+  "DEBUG": true,
+  "SECURITY_UNAUTHORIZED_VIEW": "/login"
+}

@@ -1,14 +1,16 @@
+import json
 import os
 
-from flask import Flask, render_template_string
-from flask_security import Security, current_user, auth_required, \
-     SQLAlchemySessionUserDatastore
+from flask import Flask
+from flask_security import Security, current_user, SQLAlchemySessionUserDatastore
 from database import db_session, init_db
 from models import User, Role
 
+from blueprints.index import index
+
 # Create app
 app = Flask(__name__)
-app.config['DEBUG'] = True
+app.config.from_file("config.json", json.load)
 
 # Generate a nice key using secrets.token_urlsafe()
 app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY", 'pf9Wkove4IKEAXvy-cQkeDPhv9Cb3Ag-wyJILbq_dFw')
@@ -24,15 +26,12 @@ security = Security(app, user_datastore)
 @app.before_first_request
 def create_user():
     init_db()
-    if not user_datastore.find_user(email="fabi@me.com"):
-        user_datastore.create_user(email="fabi@me.com", password="password")
-    db_session.commit()
+    if not user_datastore.find_user(email="manu@me.com"):
+        user_datastore.create_user(email="manu@me.com", password="password")
+        db_session.commit()
 
-# Views
-@app.route("/")
-@auth_required()
-def home():
-    return render_template_string('Hello {{email}} !', email=current_user.email)
+
+app.register_blueprint(index)
 
 if __name__ == '__main__':
     app.run()
